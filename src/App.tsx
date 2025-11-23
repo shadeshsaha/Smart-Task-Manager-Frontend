@@ -1,35 +1,111 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
+import { Provider } from "react-redux";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import { store } from "./redux/store";
+
+import { Toaster } from "@/components/ui/toaster";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import SidebarLayout from "./layouts/SidebarLayout";
+
+// Auth Pages
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import LoginPage from "./pages/auth/LoginPage";
+import OTPPage from "./pages/auth/OTPPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+
+// Dashboard
+import DashboardPage from "./pages/dashboard/DashboardPage";
+
+// Projects
+import CreateProjectPage from "./pages/projects/CreateProjectPage";
+import EditProjectPage from "./pages/projects/EditProjectPage";
+import ProjectsPage from "./pages/projects/ProjectsPage";
+
+// Teams
+import CreateTeamPage from "./pages/teams/CreateTeamPage";
+import EditTeamPage from "./pages/teams/EditTeamPage";
+import TeamsPage from "./pages/teams/TeamsPage";
+
+// Members
+import CreateMemberPage from "./pages/members/CreateMemberPage";
+import EditMemberPage from "./pages/members/EditMemberPage";
+import MembersPage from "./pages/members/MembersPage";
+
+// Tasks
+import CreateTaskPage from "./pages/tasks/CreateTaskPage";
+import EditTaskPage from "./pages/tasks/EditTaskPage";
+import TasksPage from "./pages/tasks/TasksPage";
+
+// Reassign
+import ReassignTasksPage from "./pages/reassign/ReassignTasksPage";
+
+// Activity Logs
+import ActivityLogPage from "./pages/activity/ActivityLogPage";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Provider store={store}>
+      <Router>
+        <Toaster />
+
+        <Routes>
+          {/* -------------------- PUBLIC ROUTES -------------------- */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-otp" element={<OTPPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+          {/* -------------------- PROTECTED ROUTES -------------------- */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <SidebarLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+
+            {/* Projects */}
+            <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/create" element={<CreateProjectPage />} />
+            <Route path="projects/edit/:id" element={<EditProjectPage />} />
+
+            {/* Teams */}
+            <Route path="teams" element={<TeamsPage />} />
+            <Route path="teams/create" element={<CreateTeamPage />} />
+            <Route path="teams/edit/:id" element={<EditTeamPage />} />
+
+            {/* Members */}
+            <Route path="members" element={<MembersPage />} />
+            <Route path="members/create" element={<CreateMemberPage />} />
+            <Route path="members/edit/:id" element={<EditMemberPage />} />
+
+            {/* Tasks */}
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="tasks/create" element={<CreateTaskPage />} />
+            <Route path="tasks/edit/:id" element={<EditTaskPage />} />
+
+            {/* Reassign */}
+            <Route path="reassign" element={<ReassignTasksPage />} />
+
+            {/* Activity Logs */}
+            <Route path="activity-logs" element={<ActivityLogPage />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Router>
+    </Provider>
+  );
 }
 
-export default App
+export default App;
