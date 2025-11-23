@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/api/tasks.ts
 import api from "./axios";
 
 export const fetchTasks = (params?: Record<string, any>) =>

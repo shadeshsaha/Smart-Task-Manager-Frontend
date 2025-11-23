@@ -118,7 +118,7 @@ import Register from "./pages/auth/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
 import ProjectList from "./pages/projects/ProjectList";
 import ReassignTasks from "./pages/reassign/ReassignTasks";
-import TaskCreate from "./pages/tasks/TaskCreate";
+import TaskCreate from "./pages/tasks/CreateTask";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
