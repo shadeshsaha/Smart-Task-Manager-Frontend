@@ -1,55 +1,55 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button, Card, Form, Input } from "antd";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginUser } from "../../features/auth/authActions";
-import { useAppDispatch } from "../../utils/hooks";
+import { loginUser } from "../../api/auth";
+import { loginSuccess } from "../../redux/slices/authSlice";
 
-export default function Login() {
-  const dispatch = useAppDispatch();
+const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onFinish = async (values: any) => {
     try {
-      await dispatch(loginUser(email, password));
-      toast.success("Login successful");
+      setLoading(true);
+      const data = await loginUser(values);
+      dispatch(loginSuccess({ token: data.token, userId: data.id }));
+      toast.success("Login successful!");
       navigate("/");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow w-96"
-      >
-        <h2 className="text-xl font-bold mb-4">Login</h2>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="w-full mb-3 p-2 border rounded"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full mb-3 p-2 border rounded"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded"
+    <Card
+      title="Login"
+      style={{ maxWidth: 400, margin: "auto", marginTop: 100 }}
+    >
+      <Form layout="vertical" onFinish={onFinish}>
+        <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true }]}
         >
-          Login
-        </button>
-      </form>
-    </div>
+          <Input.Password />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading} block>
+            Login
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
-}
+};
+
+export default Login;
