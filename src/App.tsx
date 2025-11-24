@@ -109,71 +109,31 @@
 
 // export default App;
 
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { Sidebar } from "./components/sidebar/Sidebar";
-import ToastContainer from "./components/toast/ToastContainer";
-import ActivityLog from "./pages/activity/ActivityLog";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Dashboard from "./pages/dashboard/Dashboard";
-import ProjectList from "./pages/projects/ProjectList";
-import ReassignTasks from "./pages/reassign/ReassignTasks";
-import TaskCreate from "./pages/tasks/CreateTask";
-import ProtectedRoute from "./routes/ProtectedRoute";
 
-export default function App() {
+function App() {
   return (
-    <Router>
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-1 p-4">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/projects"
-              element={
-                <ProtectedRoute>
-                  <ProjectList />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/tasks"
-              element={
-                <ProtectedRoute>
-                  <TaskCreate />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reassign"
-              element={
-                <ProtectedRoute>
-                  <ReassignTasks />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/activity"
-              element={
-                <ProtectedRoute>
-                  <ActivityLog />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
-      </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <div>Dashboard will come here...</div>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
       <ToastContainer />
-    </Router>
+    </BrowserRouter>
   );
 }
+
+export default App;
