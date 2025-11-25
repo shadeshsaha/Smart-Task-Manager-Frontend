@@ -115,6 +115,8 @@ import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Dashboard from "./pages/Dashboard";
+import Layout from "./pages/Layout";
 
 function App() {
   return (
@@ -126,10 +128,12 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <div>Dashboard will come here...</div>
+              <Layout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<Dashboard />} />
+        </Route>
       </Routes>
       <ToastContainer />
     </BrowserRouter>
