@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import dashboardReducer from "./slices/dashboardSlice";
 import projectsReducer from "./slices/projectsSlice";
+import tasksReducer from "./slices/tasksSlice";
 import teamsReducer from "./slices/teamsSlice";
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     projects: projectsReducer,
     teams: teamsReducer,
+    tasks: tasksReducer,
   },
 });
 
