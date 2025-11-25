@@ -1,171 +1,273 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { useEffect, useState } from "react";
-// import { toast } from "react-toastify";
-// import {
-//   createTeam,
-//   deleteTeam,
-//   fetchTeams,
-//   updateTeam,
-// } from "../../features/teams/teamActions";
-// import { useAppDispatch, useAppSelector } from "../../utils/hooks";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  Modal,
+  Space,
+  Table,
+  Typography,
+} from "antd";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addMember,
+  addTeam,
+  editMember,
+  editTeam,
+  fetchMembers,
+  fetchTeams,
+  removeMember,
+  removeTeam,
+} from "../../redux/slices/teamsSlice";
+import type { RootState } from "../../redux/store";
 
-// import { Button } from "@/components/ui/button";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
-// import { Input } from "@/components/ui/input";
+import type { Member, Team } from "../../redux/slices/teamsSlice";
 
-// export default function TeamsPage() {
-//   const dispatch = useAppDispatch();
-//   const teams = useAppSelector((state) => state.teams.teams);
+const { Title } = Typography;
 
-//   const [teamName, setTeamName] = useState("");
-//   const [editTeamId, setEditTeamId] = useState<number | null>(null);
+const TeamsPage = () => {
+  const dispatch = useDispatch<any>();
 
-//   useEffect(() => {
-//     dispatch(fetchTeams());
-//   }, [dispatch]);
+  const { teams, members, loading } = useSelector(
+    (state: RootState) => state.teams
+  );
+  const token = useSelector((state: RootState) => state.auth.token);
 
-//   const handleCreate = async () => {
-//     try {
-//       await dispatch(createTeam({ name: teamName }));
-//       toast.success("Team created");
-//       setTeamName("");
-//       dispatch(fetchTeams());
-//     } catch {
-//       toast.error("Error creating team");
-//     }
-//   };
+  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
-//   const handleEdit = async () => {
-//     if (!editTeamId) return;
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [teamForm] = Form.useForm();
 
-//     try {
-//       await dispatch(updateTeam(editTeamId, { name: teamName }));
-//       toast.success("Team updated");
-//       setEditTeamId(null);
-//       setTeamName("");
-//       dispatch(fetchTeams());
-//     } catch {
-//       toast.error("Error updating team");
-//     }
-//   };
+  const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [memberForm] = Form.useForm();
 
-//   const handleDelete = async (id: number) => {
-//     try {
-//       await dispatch(deleteTeam(id));
-//       toast.success("Team deleted");
-//       dispatch(fetchTeams());
-//     } catch {
-//       toast.error("Failed to delete team");
-//     }
-//   };
+  /** ---------------------------
+   * Load Teams
+   ---------------------------- */
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchTeams(token));
+    }
+  }, [token, dispatch]);
 
-//   const openEdit = (team: any) => {
-//     setEditTeamId(team.id);
-//     setTeamName(team.name);
-//   };
+  /** ---------------------------
+   * Load Members for selected team
+   ---------------------------- */
+  const loadMembers = useCallback(
+    (id: number) => {
+      if (!members[id]) {
+        dispatch(fetchMembers({ teamId: id, token }));
+      }
+      setSelectedTeamId(id);
+    },
+    [dispatch, members, token]
+  );
 
-//   return (
-//     <div className="p-4">
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>Teams</CardTitle>
-//         </CardHeader>
+  /** ---------------------------
+   * Team Table Columns
+   ---------------------------- */
+  const teamColumns = [
+    {
+      title: "Team Name",
+      dataIndex: "name",
+    },
+    {
+      title: "Actions",
+      render: (team: Team) => (
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => {
+              setEditingTeam(team);
+              teamForm.setFieldsValue(team);
+              setIsTeamModalOpen(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            danger
+            onClick={() => dispatch(removeTeam({ id: team.id, token }))}
+          >
+            Delete
+          </Button>
+          <Button type="dashed" onClick={() => loadMembers(team.id)}>
+            Members
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
-//         <CardContent>
-//           {/* Create Team */}
-//           <Dialog>
-//             <DialogTrigger asChild>
-//               <Button className="mb-4">Create Team</Button>
-//             </DialogTrigger>
+  /** ---------------------------
+   * Member Table Columns
+   ---------------------------- */
+  const memberColumns = [
+    { title: "Name", dataIndex: "name" },
+    { title: "Email", dataIndex: "email" },
+    { title: "Role", dataIndex: "role" },
+    {
+      title: "Actions",
+      render: (m: Member) => (
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => {
+              setEditingMember(m);
+              memberForm.setFieldsValue(m);
+              setIsMemberModalOpen(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            danger
+            onClick={() =>
+              dispatch(
+                removeMember({ id: m.id, teamId: selectedTeamId!, token })
+              )
+            }
+          >
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
-//             <DialogContent>
-//               <DialogHeader>
-//                 <DialogTitle>Create Team</DialogTitle>
-//               </DialogHeader>
+  /** ---------------------------
+   * Submit Team
+   ---------------------------- */
+  const handleTeamSubmit = (values: any) => {
+    if (editingTeam) {
+      dispatch(editTeam({ id: editingTeam.id, data: values, token }));
+    } else {
+      dispatch(addTeam({ data: values, token }));
+    }
+    setIsTeamModalOpen(false);
+    teamForm.resetFields();
+    setEditingTeam(null);
+  };
 
-//               <Input
-//                 placeholder="Team Name"
-//                 value={teamName}
-//                 onChange={(e) => setTeamName(e.target.value)}
-//               />
+  /** ---------------------------
+   * Submit Member
+   ---------------------------- */
+  const handleMemberSubmit = (values: any) => {
+    if (!selectedTeamId) return;
 
-//               <Button className="mt-2" onClick={handleCreate}>
-//                 Save
-//               </Button>
-//             </DialogContent>
-//           </Dialog>
+    if (editingMember) {
+      dispatch(editMember({ id: editingMember.id, data: values, token }));
+    } else {
+      dispatch(addMember({ teamId: selectedTeamId, data: values, token }));
+    }
+    setIsMemberModalOpen(false);
+    memberForm.resetFields();
+    setEditingMember(null);
+  };
 
-//           <table className="w-full border">
-//             <thead className="bg-gray-100">
-//               <tr>
-//                 <th className="p-2">ID</th>
-//                 <th className="p-2">Team Name</th>
-//                 <th className="p-2">Actions</th>
-//               </tr>
-//             </thead>
+  return (
+    <div style={{ padding: 24 }}>
+      <Title level={3}>Teams</Title>
 
-//             <tbody>
-//               {teams.map((team: any) => (
-//                 <tr key={team.id} className="border-t">
-//                   <td className="p-2">{team.id}</td>
-//                   <td className="p-2">{team.name}</td>
-//                   <td className="p-2 flex gap-2">
-//                     {/* Edit */}
-//                     <Dialog>
-//                       <DialogTrigger asChild>
-//                         <Button size="sm" onClick={() => openEdit(team)}>
-//                           Edit
-//                         </Button>
-//                       </DialogTrigger>
+      <Button
+        type="primary"
+        style={{ marginBottom: 20 }}
+        onClick={() => {
+          setEditingTeam(null);
+          teamForm.resetFields();
+          setIsTeamModalOpen(true);
+        }}
+      >
+        Add Team
+      </Button>
 
-//                       <DialogContent>
-//                         <DialogHeader>
-//                           <DialogTitle>Edit Team</DialogTitle>
-//                         </DialogHeader>
+      <Table
+        dataSource={teams}
+        columns={teamColumns}
+        loading={loading}
+        rowKey="id"
+        pagination={false}
+      />
 
-//                         <Input
-//                           value={teamName}
-//                           onChange={(e) => setTeamName(e.target.value)}
-//                         />
+      {selectedTeamId && (
+        <>
+          <Divider />
+          <Title level={4}>
+            Members of{" "}
+            {teams.find((t) => t.id === selectedTeamId)?.name || "Team"}
+          </Title>
 
-//                         <Button className="mt-2" onClick={handleEdit}>
-//                           Update
-//                         </Button>
-//                       </DialogContent>
-//                     </Dialog>
+          <Button
+            type="primary"
+            onClick={() => {
+              setEditingMember(null);
+              memberForm.resetFields();
+              setIsMemberModalOpen(true);
+            }}
+            style={{ marginBottom: 20 }}
+          >
+            Add Member
+          </Button>
 
-//                     {/* Delete */}
-//                     <Button
-//                       size="sm"
-//                       variant="destructive"
-//                       onClick={() => handleDelete(team.id)}
-//                     >
-//                       Delete
-//                     </Button>
+          <Table
+            dataSource={members[selectedTeamId] || []}
+            columns={memberColumns}
+            rowKey="id"
+          />
+        </>
+      )}
 
-//                     {/* Manage Members */}
-//                     <Button
-//                       size="sm"
-//                       onClick={() =>
-//                         (window.location.href = `/teams/${team.id}/members`)
-//                       }
-//                     >
-//                       Members
-//                     </Button>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }
+      {/* TEAM MODAL */}
+      <Modal
+        title={editingTeam ? "Edit Team" : "Add Team"}
+        open={isTeamModalOpen}
+        onCancel={() => setIsTeamModalOpen(false)}
+        onOk={() => teamForm.submit()}
+        okText="Save"
+      >
+        <Form layout="vertical" form={teamForm} onFinish={handleTeamSubmit}>
+          <Form.Item
+            name="name"
+            label="Team Name"
+            rules={[{ required: true, message: "Team name required" }]}
+          >
+            <Input placeholder="Enter team name" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* MEMBER MODAL */}
+      <Modal
+        title={editingMember ? "Edit Member" : "Add Member"}
+        open={isMemberModalOpen}
+        onCancel={() => setIsMemberModalOpen(false)}
+        onOk={() => memberForm.submit()}
+        okText="Save"
+      >
+        <Form layout="vertical" form={memberForm} onFinish={handleMemberSubmit}>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Member name required" }]}
+          >
+            <Input placeholder="Enter name" />
+          </Form.Item>
+
+          <Form.Item name="email" label="Email">
+            <Input placeholder="Enter email" />
+          </Form.Item>
+
+          <Form.Item name="role" label="Role">
+            <Input placeholder="Enter role" />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default TeamsPage;

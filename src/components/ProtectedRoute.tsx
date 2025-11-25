@@ -8,15 +8,23 @@ interface Props {
 }
 
 const ProtectedRoute = ({ children }: Props) => {
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated
-  );
+  // const isAuthenticated = useSelector(
+  //   (state: RootState) => state.auth.isAuthenticated
+  // );
 
-  if (!isAuthenticated) {
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/login" replace />;
+  // }
+
+  // return <>{children}</>;
+
+  const token = useSelector((state: RootState) => state.auth.token);
+
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 export default ProtectedRoute;

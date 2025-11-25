@@ -109,21 +109,29 @@
 
 // export default App;
 
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ActivityLogsPage from "./pages/activity/ActivityLog";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./pages/Layout";
+import ProjectsPage from "./pages/projects/Projects";
+import ReassignPage from "./pages/reassign/ReassignTasks";
+import TasksPage from "./pages/tasks/Tasks";
+import TeamsPage from "./pages/teams/TeamsPage";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Protected Routes */}
         <Route
           path="/"
           element={
@@ -132,12 +140,119 @@ function App() {
             </ProtectedRoute>
           }
         >
+          {/* Dashboard */}
           <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+
+          {/* Project Management */}
+          <Route path="projects" element={<ProjectsPage />} />
+
+          {/* Task Management */}
+          <Route path="tasks" element={<TasksPage />} />
+
+          {/* Teams */}
+          <Route path="teams" element={<TeamsPage />} />
+
+          {/* Auto-Reassign System */}
+          <Route path="reassign" element={<ReassignPage />} />
+
+          {/* Activity Logs */}
+          <Route path="activity" element={<ActivityLogsPage />} />
         </Route>
       </Routes>
       <ToastContainer />
-    </BrowserRouter>
+    </Router>
   );
 }
 
 export default App;
+
+/*
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/teams"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TeamsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ProjectsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TasksPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reassign"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ReassignPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/activity"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ActivityLogsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
+  );
+};
+*/
