@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Projects from "./pages/Projects";
+import Tasks from "./pages/Tasks";
 import Teams from "./pages/Teams";
 
 const App: React.FC = () => {
@@ -42,6 +43,15 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Projects />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <Tasks />
             </ProtectedRoute>
           }
         />
