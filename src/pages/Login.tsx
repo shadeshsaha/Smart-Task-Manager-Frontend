@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../app/store";
-import { loginUser } from "../features/auth/authSlice";
+import { clearError, loginUser } from "../features/auth/authSlice";
 
 const { Title } = Typography;
 
@@ -24,22 +24,31 @@ const Login: React.FC = () => {
       // Redirect programmatically when token is available
       navigate("/", { replace: true });
     }
-  }, [token, navigate]);
+    return () => {
+      dispatch(clearError());
+    };
+  }, [token, navigate, dispatch]);
 
   // If token exists, redirect immediately
-  if (token) return <Navigate to="/" replace />;
+  if (token) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div style={{ maxWidth: 400, margin: "auto", padding: "40px 0" }}>
       <Title level={2}>Smart Task Manager - Login</Title>
+
       {error && (
         <Alert
-          message={error}
+          title={error}
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
+          closable
+          onClose={() => dispatch(clearError())}
         />
       )}
+
       <Form name="login" onFinish={onFinish} layout="vertical">
         <Form.Item
           label="Email"
@@ -51,6 +60,7 @@ const Login: React.FC = () => {
         >
           <Input />
         </Form.Item>
+
         <Form.Item
           label="Password"
           name="password"
@@ -58,9 +68,16 @@ const Login: React.FC = () => {
         >
           <Input.Password />
         </Form.Item>
+
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading} block>
             Login
+          </Button>
+        </Form.Item>
+
+        <Form.Item style={{ textAlign: "center" }}>
+          <Button type="link" onClick={() => navigate("/register")}>
+            Don't have an account? Register now
           </Button>
         </Form.Item>
       </Form>

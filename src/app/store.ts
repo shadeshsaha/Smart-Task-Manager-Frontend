@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import activityLogReducer from "../features/activityLog/activityLogSlice";
 import authReducer from "../features/auth/authSlice";
 import projectsReducer from "../features/projects/projectsSlice";
 import reassignReducer from "../features/reassign/reassignSlice";
@@ -12,7 +13,7 @@ export const store = configureStore({
     projects: projectsReducer,
     tasks: tasksReducer,
     reassign: reassignReducer,
-    // Add other reducers later: teams, projects, tasks, reassign, activityLog
+    activityLog: activityLogReducer,
   },
 });
 

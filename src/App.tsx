@@ -6,10 +6,12 @@ import {
   Routes,
 } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ActivityLog from "./pages/ActivityLog";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Projects from "./pages/Projects";
 import Reassign from "./pages/Reassign";
+import Register from "./pages/Register";
 import Tasks from "./pages/Tasks";
 import Teams from "./pages/Teams";
 
@@ -19,6 +21,7 @@ const App: React.FC = () => {
       <Routes>
         {/* Public login route */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Protected route */}
         <Route
@@ -62,6 +65,15 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Reassign />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/activity-log"
+          element={
+            <ProtectedRoute>
+              <ActivityLog />
             </ProtectedRoute>
           }
         />
