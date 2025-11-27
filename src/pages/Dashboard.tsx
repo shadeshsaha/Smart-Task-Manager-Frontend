@@ -45,7 +45,7 @@ const Dashboard: React.FC = () => {
         setTotalProjects(projectsRes.data.projects.length);
         setTotalTasks(tasksRes.data.tasks.length);
 
-        // Example fetching first team members for summary (adjust per your backend)
+        // Example fetching first team members for summary (adjust per backend)
         const teamId = 1; // adjust dynamically or from user context
         const teamRes = await axios.get(`/teams/${teamId}/members`);
         setTeamSummary(
@@ -58,7 +58,7 @@ const Dashboard: React.FC = () => {
 
         // Fetch recent activity logs
         const logsRes = await axios.get("/reassign/logs");
-        setActivityLogs(logsRes.data.logs);
+        setActivityLogs(logsRes.data.logs || []);
 
         // Recent Reassignments: filter from activity logs with parsing or keep separately
         const recentTasksData: RecentTask[] = logsRes.data.logs
@@ -73,7 +73,7 @@ const Dashboard: React.FC = () => {
                   title: match[1],
                   from: match[2],
                   to: match[3],
-                  priority: "Low/Medium", // You may fetch real priority if needed
+                  priority: "Low/Medium", // may fetch real priority if needed
                 }
               : {
                   key: index,

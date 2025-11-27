@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Projects from "./pages/Projects";
+import Reassign from "./pages/Reassign";
 import Tasks from "./pages/Tasks";
 import Teams from "./pages/Teams";
 
@@ -52,6 +53,15 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Tasks />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reassign"
+          element={
+            <ProtectedRoute>
+              <Reassign />
             </ProtectedRoute>
           }
         />
