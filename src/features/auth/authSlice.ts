@@ -29,6 +29,7 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
+  // role: string;
 }
 
 export interface LoginData {
@@ -40,7 +41,7 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (registerData: RegisterData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/auth/register", registerData);
+      const response = await axios.post("/users/register", registerData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
